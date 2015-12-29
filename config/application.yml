@@ -1,0 +1,34 @@
+common: &common
+  # our public key
+  abf_url: 'http://172.17.0.1'
+  file_store:
+    url: 'http://file-store.openmandriva.org/api/v1/file_stores'
+    create_url: 'http://file-store.openmandriva.org/api/v1/upload'
+    token: 'K3esBGTzbz7Ggvw4isrx'
+  supported_platforms: ''
+  supported_arches: ''
+  output_folder: '/home/omv/output'
+
+development:
+  <<: *common
+  abf_api:
+    url: 'http://localhost/api/v1'
+    token: 'yz5sh9R6mzEtqy9WjzwV'
+
+production:
+  <<: *common
+  abf_api:
+    url: 'http://172.17.0.1/api/v1'
+    token: 'yz5sh9R6mzEtqy9WjzwV'
+
+test:
+  <<: *common
+  tmp_path: 'tmp_path'
+  vms_path: 'vms_path'
+  abf_api:
+    url: 'http://0.0.0.0:3000/api/v1'
+    token: 'token'
+  vm:
+    x86_64: 512
+    i586: 512
+    cpus: 1
