@@ -19,6 +19,8 @@ GEM
       net-ssh (>= 2.0.14)
       net-ssh-gateway (>= 1.1.0)
     capistrano_colors (0.5.5)
+    config_for (0.2.1)
+      activesupport (>= 3.0)
     diff-lcs (1.2.5)
     god (0.13.7)
     hashie (1.2.0)
@@ -75,6 +77,7 @@ DEPENDENCIES
   cape
   capistrano
   capistrano_colors
+  config_for
   god
   log4r (= 1.1.10)
   mock_redis

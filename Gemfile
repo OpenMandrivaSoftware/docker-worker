@@ -2,6 +2,7 @@ source 'http://rubygems.org'
 
 gem 'rake'
 gem 'god'
+gem 'config_for'
 
 gem 'log4r', '1.1.10'
 gem 'api_smith', '1.2.0'

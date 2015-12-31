@@ -52,7 +52,11 @@ module AbfWorker
         clazz  = job.worker_class.split('::').inject(Object){ |o,c| o.const_get c }
         worker = clazz.new(job.worker_args[0])
 
-        worker.perform
+        begin
+          worker.perform
+        rescue Exception => e
+          File.open(ROOT + "error.log", "a") { |f| f.write(e.to_s + "\n"); e.backtrace.each { |b| f.write(b + "\n") } }
+        end
       end
     end
 
