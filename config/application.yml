@@ -6,7 +6,7 @@ common: &common
     create_url: 'http://file-store.openmandriva.org/api/v1/upload'
     token: <%= ENV["BUILD_TOKEN"] %>
   supported_platforms: ''
-  supported_arches: ''
+  supported_arches: <%= ENV["BUILD_ARCH"] %>
   output_folder: '/home/omv/output'
 
 development:
