@@ -1,6 +1,5 @@
 module AbfWorker
   class BaseWorker
-    include Log4r
 
     BUILD_COMPLETED = 0
     BUILD_FAILED    = 1
