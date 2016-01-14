@@ -14,7 +14,6 @@ module AbfWorker
                   :worker_id,
                   :tmp_dir,
                   :live_inspector,
-                  :logger_name,
                   :shutdown,
                   :url_to_build
 
@@ -69,7 +68,6 @@ module AbfWorker
         file_name << '.tar.gz'
       end
 
-      logger.log "Uploading file '#{file_name}'...."
       sha1 = Digest::SHA1.file(path_to_file).hexdigest
 
       # curl --user myuser@gmail.com:mypass -POST -F "file_store[file]=@files/archive.zip" http://file-store.rosalinux.ru/api/v1/file_stores.json
@@ -81,12 +79,11 @@ module AbfWorker
         command << '" '
         command << APP_CONFIG['file_store']['create_url']
         command << ' --connect-timeout 5 --retry 5'
-        logger.log %x[ #{command} ]
+        %x[ #{command} ]
       end
 
       # File.delete path_to_file
       system "sudo rm -rf #{path_to_file}"
-      logger.log 'Done.'
       {:sha1 => sha1, :file_name => file_name, :size => file_size}
     end
 
