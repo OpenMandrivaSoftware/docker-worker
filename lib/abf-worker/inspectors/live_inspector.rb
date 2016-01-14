@@ -26,11 +26,9 @@ module AbfWorker::Inspectors
 
     def kill_now?
       if @kill_at < Time.now
-        @worker.logger.log 'Time expired, VM will be stopped...'
         return true
       end
       if status == 'USR1'
-        @worker.logger.log 'Received signal to stop VM...'
         true
       else
         false
@@ -49,7 +47,7 @@ module AbfWorker::Inspectors
       return nil if @worker.is_a?(AbfWorker::PublishWorker)
       return 'USR1' if @worker.shutdown
       q = 'abfworker::'
-      q << (@worker.is_a?(AbfWorker::IsoWorker) ? 'iso' : 'rpm')
+      q << 'rpm'
       q << '-worker-'
       q << @worker.build_id.to_s
       q << '::live-inspector'

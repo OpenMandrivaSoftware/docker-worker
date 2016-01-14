@@ -17,15 +17,13 @@ module AbfWorker
       Signal.trap("USR1") { stop_and_clean }
       loop do 
         find_new_job unless shutdown?
-        if shutdown?
-          remove_pid
+        if shutdown? and not @worker_thread.alive?
           return
         end
+        cleanup_worker_thread
         send_statistics
         sleep 10
       end
-    rescue => e
-      AbfWorker::BaseWorker.send_error(e)
     end
 
     private
@@ -40,6 +38,12 @@ module AbfWorker
       })
     end
 
+    def cleanup_worker_thread
+      return if @worker_thread.nil? or @worker_thread.alive?
+      @worker_thread[:subthreads].each { |t| t.kill }
+      @worker_thread.kill
+    end
+
     def stop_and_clean
       @shutdown = true
     end
@@ -49,29 +53,15 @@ module AbfWorker
       return unless job = AbfWorker::Models::Job.shift
 
       @worker_thread = Thread.new do
-        clazz  = job.worker_class.split('::').inject(Object){ |o,c| o.const_get c }
-        worker = clazz.new(job.worker_args[0])
+        worker = AbfWorker::RpmWorker.new(job.worker_args[0])
+        Thread.current[:worker] = worker
 
-        begin
-          worker.perform
-        rescue Exception => e
-          File.open(ROOT + "error.log", "a") { |f| f.write(e.to_s + "\n"); e.backtrace.each { |b| f.write(b + "\n") } }
-        end
+        worker.perform
       end
     end
 
     def shutdown?
       @shutdown
     end
-
-    def touch_pid
-      path = "#{ROOT}/pids/#{@pid}"
-      system "touch #{path}" unless File.exist?(path) 
-    end
-
-    def remove_pid
-      system "rm -f #{ROOT}/pids/#{@pid}"
-    end
-
   end
 end

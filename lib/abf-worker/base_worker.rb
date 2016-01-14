@@ -1,9 +1,3 @@
-require 'net/ssh'
-require 'abf-worker/exceptions/script_error'
-require 'abf-worker/outputters/logger'
-require 'abf-worker/outputters/live_outputter'
-require 'socket'
-
 module AbfWorker
   class BaseWorker
     include Log4r
@@ -14,7 +8,6 @@ module AbfWorker
     BUILD_STARTED   = 3
     BUILD_CANCELED  = 4
     TESTS_FAILED    = 5
-    VM_ERROR        = 6
     TWO_IN_THE_TWENTIETH = 2**20
 
     attr_accessor :status,
@@ -41,42 +34,12 @@ module AbfWorker
     def perform
       @runner.run_script
       send_results
-      cleanup
-    end
-
-    def print_error(e)
-      self.class.send_error e, {
-        hostname:   Socket.gethostname,
-        worker_id:  @worker_id,
-        options:    @options
-      }
-      a = []
-      a << '==> ABF-WORKER-ERROR-START'
-      a << 'Something went wrong, report has been sent to ABF team, please try again.'
-      a << 'If this error will be happen again, please inform us using https://abf.rosalinux.ru/contact'
-      a << '----------'
-      a << e.message.gsub(*AbfWorker::Outputters::Logger::FILTER)
-      a << e.backtrace.join("\n")
-      a << '<== ABF-WORKER-ERROR-END'
-      logger.error a.join("\n")
-    end
-
-
-    def self.send_error(e, params = {})
-      Airbrake.notify(e, parameters: params) if APP_CONFIG['env'] == 'production'
-      puts e.message.gsub(*AbfWorker::Outputters::Logger::FILTER)
-      puts e.backtrace.join("\n")
-    end
-
-    def logger
-      @logger || init_logger('abfworker::base-worker')
     end
 
     protected
 
     def url_to_build
       return @url_to_build if @url_to_build
-      #path = runner.is_a?(AbfWorker::Runners::Iso) ? 'product_build_lists' : 'build_lists'
       path = 'build_lists'
       @url_to_build = "#{APP_CONFIG['abf_url']}/#{path}/#{@build_id}"
     end
@@ -139,42 +102,16 @@ module AbfWorker
       uploaded.compact
     end
 
-    def cleanup
-      return unless @logger
-      @logger.outputters.select{ |o| o.is_a?(AbfWorker::Outputters::LiveOutputter) }.each do |o|
-        o.stop
-      end
-    end
-
     def initialize_live_inspector(time_living)
       @live_inspector = AbfWorker::Inspectors::LiveInspector.new(self, time_living)
       @live_inspector.run
-    end
-
-    def init_logger(logger_name = nil)
-      @logger_name = logger_name
-      @logger = AbfWorker::Outputters::Logger.new @logger_name
-      @logger.outputters << Log4r::Outputter.stdout
-
-      # see: https://github.com/colbygk/log4r/blob/master/lib/log4r/formatter/patternformatter.rb#L22
-      formatter = Log4r::PatternFormatter.new(pattern: "%m")
-      unless @skip_feedback
-        @logger.outputters << Log4r::FileOutputter.new(
-          @logger_name, { filename: "log/#{@logger_name}.log", formatter: formatter }
-        )
-
-        @logger.outputters << AbfWorker::Outputters::LiveOutputter.new(
-          @logger_name, { formatter: formatter, worker: self}
-        )
-      end
-      @logger
     end
 
     def update_build_status_on_abf(args = {}, force = false)
       if !@skip_feedback || force
         worker_args = [{
           id:     @build_id,
-          status: (@status == VM_ERROR ? BUILD_FAILED : @status),
+          status: @status,
           extra:  @extra
         }.merge(args)]
 

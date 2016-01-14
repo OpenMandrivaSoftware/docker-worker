@@ -3,13 +3,8 @@ require 'abf-worker/inspectors/live_inspector'
 
 module AbfWorker
   class RpmWorker < BaseWorker
-    @queue = :rpm_worker
 
     attr_accessor :runner
-
-    def logger
-      @logger || init_logger("abfworker::rpm-worker-#{@build_id}")
-    end
 
     protected
 
@@ -36,7 +31,4 @@ module AbfWorker
 
   end
 
-  class RpmWorkerDefault < RpmWorker
-    @queue = :rpm_worker_default
-  end
 end
