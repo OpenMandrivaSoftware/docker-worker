@@ -55,11 +55,7 @@ module AbfWorker
         worker = AbfWorker::RpmWorker.new(job.worker_args[0])
         Thread.current[:worker] = worker
 
-	begin
         worker.perform
-	rescue => e
-		File.open("/home/omv/error.log", "w") { |f| f.write(e.backtrace); f.write(e.message) }
-	end
       end
     end
 

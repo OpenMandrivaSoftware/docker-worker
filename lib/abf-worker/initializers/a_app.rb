@@ -1,5 +1,7 @@
 require 'config_for'
 
+Thread.abort_on_exception = true
+
 env = ENV['ENV'] || 'development'
 
 ROOT = File.dirname(__FILE__) + '/../../../'
