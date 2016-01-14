@@ -10,7 +10,6 @@ module AbfWorker
       @worker_thread = nil
       @pid      = Process.pid
       @uid      = SecureRandom.hex
-      touch_pid
     end
 
     def run
