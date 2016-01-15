@@ -16,6 +16,8 @@ module AbfWorker::Inspectors
             sleep CHECK_INTERVAL
             stop_build if kill_now?
           rescue => e
+            puts e.backtrace
+            puts e.message
           end
         end
       end
