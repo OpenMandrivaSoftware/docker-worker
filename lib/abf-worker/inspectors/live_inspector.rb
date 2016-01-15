@@ -13,6 +13,7 @@ module AbfWorker::Inspectors
       @thread = Thread.new do
         while true
           begin
+	    puts 'we are here'
             sleep CHECK_INTERVAL
             stop_build if kill_now?
           rescue => e
