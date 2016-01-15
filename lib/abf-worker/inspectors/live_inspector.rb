@@ -44,7 +44,6 @@ module AbfWorker::Inspectors
     end
 
     def status
-      return nil if @worker.is_a?(AbfWorker::PublishWorker)
       return 'USR1' if @worker.shutdown
       q = 'abfworker::'
       q << 'rpm'
