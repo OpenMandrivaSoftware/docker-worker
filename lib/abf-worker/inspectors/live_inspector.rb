@@ -2,7 +2,7 @@ require 'time'
 
 module AbfWorker::Inspectors
   class LiveInspector
-    CHECK_INTERVAL = 60 # 60 sec
+    CHECK_INTERVAL = 10 # 60 sec
 
     def initialize(worker, time_living)
       @worker       = worker
@@ -38,11 +38,17 @@ module AbfWorker::Inspectors
     end
 
     def stop_build
+      begin
       @worker.status = AbfWorker::BaseWorker::BUILD_CANCELED
+      puts @worker.status
       runner = @worker.runner
       runner.can_run = false
       runner.script_runner.kill if runner.script_runner
       runner.rollback if runner.respond_to?(:rollback)
+      rescue => e
+        puts e.backtrace
+        puts e.message
+      end
     end
 
     def status
