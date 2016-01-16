@@ -13,12 +13,9 @@ module AbfWorker::Inspectors
       @thread = Thread.new do
         while true
           begin
-	    puts 'we are here'
             sleep CHECK_INTERVAL
             stop_build if kill_now?
           rescue => e
-            puts e.backtrace
-            puts e.message
           end
         end
       end
@@ -53,7 +50,9 @@ module AbfWorker::Inspectors
       q << '-worker-'
       q << @worker.build_id.to_s
       q << '::live-inspector'
-      AbfWorker::Models::Job.status(key: q)
+      res = AbfWorker::Models::Job.status(key: q)
+      puts res
+      res
     end
 
   end

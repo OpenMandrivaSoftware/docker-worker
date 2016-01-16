@@ -45,6 +45,10 @@ module AbfWorker::Runners
           @cmd_params.each { |key, value| @cmd_params[key] = value.to_s }
 
           process = IO.popen(@cmd_params, '/bin/bash /' + @platform['type'] + '/build-rpm.sh &> /dev/null 2&>1', 'r') do |io| 
+            loop do
+              break if io.eof
+              puts io.gets
+            end
             Process.wait(io.pid) 
             @exit_status = $?.exitstatus
           end
