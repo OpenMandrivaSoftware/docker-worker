@@ -19,6 +19,7 @@ module AbfWorker
     end
 
     def send_results
+      begin
       sha1_s  = @runner.packages.map{ |p| p['sha1'] }
       results = upload_results_to_file_store
       results.select!{ |r| !sha1_s.include?(r[:sha1]) } unless sha1_s.empty?
@@ -27,6 +28,10 @@ module AbfWorker
         packages:     @runner.packages,
         exit_status:  @runner.exit_status
       })
+      rescue => e
+        puts e.message
+        puts e.backtrace
+      end
     end
 
   end

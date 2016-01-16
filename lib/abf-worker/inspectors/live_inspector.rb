@@ -40,11 +40,11 @@ module AbfWorker::Inspectors
     def stop_build
       begin
       @worker.status = AbfWorker::BaseWorker::BUILD_CANCELED
-      puts @worker.status
       runner = @worker.runner
       runner.can_run = false
       runner.script_runner.kill if runner.script_runner
       runner.rollback if runner.respond_to?(:rollback)
+      puts runner.script_runner.status
       rescue => e
         puts e.backtrace
         puts e.message
