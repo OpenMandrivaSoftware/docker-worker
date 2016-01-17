@@ -1,17 +1,15 @@
-require 'forwardable'
+require 'thread'
 require 'json'
-require 'tempfile'
 
 module AbfWorker::Runners
   class Rpm
-    extend Forwardable
+
+    BUFFER_DUMP_INTERVAL = 60
 
     attr_accessor :script_runner,
                   :can_run,
                   :packages,
                   :exit_status
-
-    def_delegators :@worker, :logger
 
     def initialize(worker, options)
       @worker               = worker
@@ -27,36 +25,38 @@ module AbfWorker::Runners
 
     def run_script
       @script_runner = Thread.new do
-        begin
-          include_repos_names = []
-          include_repos_urls = []
-          @include_repos.each do |key, value|
-            include_repos_names << key
-            include_repos_urls << value
-          end
-          params = {
-            'REPO_NAMES'    => include_repos_names.join(' '),
-            'REPO_URL'      => include_repos_urls.join(' '),
-            'UNAME'         => @user['uname'],
-            'EMAIL'         => @user['email'],
-            'PLATFORM_ARCH' => @platform['arch']
-          }
-          @cmd_params.merge!(params)
-          @cmd_params.each { |key, value| @cmd_params[key] = value.to_s }
-
-          process = IO.popen(@cmd_params, '/bin/bash /' + @platform['type'] + '/build-rpm.sh &> /dev/null 2&>1', 'r') do |io| 
-            loop do
-              break if io.eof
-              puts io.gets
-            end
-            Process.wait(io.pid) 
-            @exit_status = $?.exitstatus
-          end
-          @worker.status = @exit_status == 0 ? AbfWorker::BaseWorker::BUILD_COMPLETED : AbfWorker::BaseWorker::BUILD_FAILED
-          save_results
-        rescue Exception => e
-          puts e.to_s
+        include_repos_names = []
+        include_repos_urls = []
+        @include_repos.each do |key, value|
+          include_repos_names << key
+          include_repos_urls << value
         end
+        params = {
+          'REPO_NAMES'    => include_repos_names.join(' '),
+          'REPO_URL'      => include_repos_urls.join(' '),
+          'UNAME'         => @user['uname'],
+          'EMAIL'         => @user['email'],
+          'PLATFORM_ARCH' => @platform['arch']
+        }
+        @cmd_params.merge!(params)
+        @cmd_params.each { |key, value| @cmd_params[key] = value.to_s }
+
+        process = IO.popen(@cmd_params, '/bin/bash /' + @platform['type'] + '/build-rpm.sh', 'r', :err => [:child, :out]) do |io|
+          reader = Thread.new do
+            loop do
+              begin
+                break if io.eof
+                @worker.logger.log(io.gets)
+              rescue => e
+                break
+              end
+            end
+          end
+          Process.wait(io.pid) 
+          @exit_status = $?.exitstatus
+        end
+        @worker.status = @exit_status == 0 ? AbfWorker::BaseWorker::BUILD_COMPLETED : AbfWorker::BaseWorker::BUILD_FAILED
+        save_results
       end
       Thread.current[:subthreads] << @script_runner
       @script_runner.join if @can_run

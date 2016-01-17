@@ -16,8 +16,6 @@ module AbfWorker::Inspectors
             sleep CHECK_INTERVAL
             stop_build if kill_now?
           rescue => e
-            puts e.message
-            puts e.backtrace
           end
         end
       end
@@ -38,17 +36,11 @@ module AbfWorker::Inspectors
     end
 
     def stop_build
-      begin
       @worker.status = AbfWorker::BaseWorker::BUILD_CANCELED
       runner = @worker.runner
       runner.can_run = false
       runner.script_runner.kill if runner.script_runner
       runner.rollback if runner.respond_to?(:rollback)
-      puts runner.script_runner.status
-      rescue => e
-        puts e.backtrace
-        puts e.message
-      end
     end
 
     def status
@@ -58,9 +50,7 @@ module AbfWorker::Inspectors
       q << '-worker-'
       q << @worker.build_id.to_s
       q << '::live-inspector'
-      res = AbfWorker::Models::Job.status(key: q)
-      puts res
-      res
+      AbfWorker::Models::Job.status(key: q)
     end
 
   end

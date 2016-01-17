@@ -1,3 +1,5 @@
+require 'abf-worker/logger'
+
 module AbfWorker
   class BaseWorker
 
@@ -40,6 +42,10 @@ module AbfWorker
       return @url_to_build if @url_to_build
       path = 'build_lists'
       @url_to_build = "#{APP_CONFIG['abf_url']}/#{path}/#{@build_id}"
+    end
+
+    def init_live_logger(key_name)
+      @logger = AbfWorker::LiveLogger.new(key_name)
     end
 
     def file_store_token
