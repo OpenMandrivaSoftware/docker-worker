@@ -39,7 +39,7 @@ module AbfWorker
 
     def cleanup_worker_thread
       return if @worker_thread.nil? or @worker_thread.alive?
-      @worker_thread[:subthreads].each { |t| puts t; t.kill }
+      @worker_thread[:subthreads].each { |t| t.kill; puts t.status }
       @worker_thread.kill
     end
 

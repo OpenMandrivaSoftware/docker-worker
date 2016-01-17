@@ -1,4 +1,3 @@
-require 'thread'
 require 'json'
 
 module AbfWorker::Runners
@@ -41,18 +40,20 @@ module AbfWorker::Runners
         @cmd_params.merge!(params)
         @cmd_params.each { |key, value| @cmd_params[key] = value.to_s }
 
-        process = IO.popen(@cmd_params, '/bin/bash /' + @platform['type'] + '/build-rpm.sh', 'r', :err => [:child, :out]) do |io|
+        process = IO.popen(@cmd_params, '/bin/bash /' + @platform['type'] + '/build-rpm.sh', 'r', :pgroup=>true) do |io|
+          Thread.current[:script_pid] = io.pid
           reader = Thread.new do
             loop do
               begin
                 break if io.eof
-                @worker.logger.log(io.gets)
+                line = io.gets
+                @worker.logger.log(line)
               rescue => e
                 break
               end
             end
           end
-          Process.wait(io.pid) 
+          Process.wait(io.pid)
           @exit_status = $?.exitstatus
         end
         @worker.status = @exit_status == 0 ? AbfWorker::BaseWorker::BUILD_COMPLETED : AbfWorker::BaseWorker::BUILD_FAILED

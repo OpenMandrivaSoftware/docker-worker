@@ -40,6 +40,8 @@ module AbfWorker::Inspectors
       runner = @worker.runner
       runner.can_run = false
       runner.script_runner.kill if runner.script_runner
+      script_pid = runner.script_runner[:script_pid]
+      Process.kill(:TERM, script_pid) if script_pid
       runner.rollback if runner.respond_to?(:rollback)
     end
 
