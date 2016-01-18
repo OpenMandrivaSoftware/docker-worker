@@ -16,7 +16,7 @@ module DockerRpmWorker
     # @param [Hash] options The hash with options
     def initialize(options)
       @observer_queue = 'rpm_worker_observer'
-      @observer_class = 'abfworker::RpmWorkerObserver'
+      @observer_class = 'AbfWorker::RpmWorkerObserver'
       super options
       @runner = DockerRpmWorker::Runners::Rpm.new(self, options)
       init_live_logger("abfworker::rpm-worker-#{@build_id}")
