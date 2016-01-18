@@ -1,7 +1,7 @@
-require 'abf-worker/runners/rpm'
-require 'abf-worker/inspectors/live_inspector'
+require 'docker-rpm-worker/runners/rpm'
+require 'docker-rpm-worker/inspectors/live_inspector'
 
-module AbfWorker
+module DockerRpmWorker
   class RpmWorker < BaseWorker
 
     attr_accessor :runner
@@ -18,8 +18,8 @@ module AbfWorker
       @observer_queue = 'rpm_worker_observer'
       @observer_class = 'AbfWorker::RpmWorkerObserver'
       super options
-      @runner = AbfWorker::Runners::Rpm.new(self, options)
-      init_live_logger("abfworker::rpm-worker-#{@build_id}")
+      @runner = DockerRpmWorker::Runners::Rpm.new(self, options)
+      init_live_logger("AbfWorker::rpm-worker-#{@build_id}")
       initialize_live_inspector options['time_living']
     end
 

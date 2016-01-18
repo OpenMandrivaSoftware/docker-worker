@@ -12,10 +12,10 @@ This describes the resources that make up the official Rosa ABF workers. If you 
     curl -L get.rvm.io | bash -s stable
     source /home/rosa/.rvm/scripts/rvm
     rvm install ruby-2.2.3
-    rvm gemset create abf-worker
-    rvm use ruby-2.2.3@abf-worker --default
+    rvm gemset create docker-rpm-worker
+    rvm use ruby-2.2.3@docker-rpm-worker --default
 
-    cd abf-worker
+    cd docker-rpm-worker
     bundle install
 
     vi config/application.yml

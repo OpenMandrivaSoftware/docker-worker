@@ -1,8 +1,8 @@
 require 'securerandom'
 require 'socket'
-require 'abf-worker/models/job'
+require 'docker-rpm-worker/models/job'
 
-module AbfWorker
+module DockerRpmWorker
   class TaskManager
 
     def initialize
@@ -29,7 +29,7 @@ module AbfWorker
 
     # only for RPM
     def send_statistics
-      AbfWorker::Models::Job.statistics({
+      DockerRpmWorker::Models::Job.statistics({
         uid:          @uid,
         worker_count: 1,
         busy_workers: (@worker_thread and @worker_thread.alive?) ? 1 : 0,
@@ -50,10 +50,10 @@ module AbfWorker
 
     def find_new_job
       return if @worker_thread and @worker_thread.alive?
-      return unless job = AbfWorker::Models::Job.shift
+      return unless job = DockerRpmWorker::Models::Job.shift
 
       @worker_thread = Thread.new do
-        worker = AbfWorker::RpmWorker.new(job.worker_args[0])
+        worker = DockerRpmWorker::RpmWorker.new(job.worker_args[0])
         Thread.current[:worker] = worker
 
         worker.perform

@@ -7,9 +7,6 @@ common: &common
   supported_platforms: <%= ENV["BUILD_PLATFORM"].to_s  %>
   supported_arches: <%= ENV["BUILD_ARCH"].to_s %>
   output_folder: <%= ENV['HOME']+'/output' %>
-
-production:
-  <<: *common
   abf_api:
     url: 'https://abf.openmandriva.org/api/v1'
     token: <%= ENV["BUILD_TOKEN"] %>

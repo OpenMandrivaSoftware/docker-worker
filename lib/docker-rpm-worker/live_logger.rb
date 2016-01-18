@@ -1,4 +1,4 @@
-module AbfWorker
+module DockerRpmWorker
   class LiveLogger
     LOG_DUMP_INTERVAL = 10 #30 seconds
     LOG_SIZE_LIMIT    = 100 # 100 lines
@@ -12,7 +12,7 @@ module AbfWorker
           next if @buffer.empty?
           str = @buffer.join
           @log_mutex.synchronize do
-            AbfWorker::Models::Job.logs({name: @key_name, logs: str})
+            DockerRpmWorker::Models::Job.logs({name: @key_name, logs: str})
           end
         end
       end

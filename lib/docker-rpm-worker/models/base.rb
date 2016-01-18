@@ -1,6 +1,6 @@
 require 'api_smith'
 
-module AbfWorker::Models
+module DockerRpmWorker::Models
   class Base
     include ::APISmith::Client
 
@@ -21,7 +21,7 @@ module AbfWorker::Models
       options_str = extra_query.map { |k,v| "#{k}: #{v}" }.join(', ')
 
       puts "Rosa-Build API Request: #{method.to_s.upcase} #{full_path} (#{options_str})"
-      # AbfWorker::BaseWorker.logger.log "Rosa-Build API Request: #{method.to_s.upcase} #{full_path} (#{options_str})"
+      # DockerRpmWorker::BaseWorker.logger.log "Rosa-Build API Request: #{method.to_s.upcase} #{full_path} (#{options_str})"
       yield if block_given? # this is where the request is sent
     end # instrument_request
 

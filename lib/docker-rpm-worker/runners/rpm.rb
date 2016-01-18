@@ -1,6 +1,6 @@
 require 'json'
 
-module AbfWorker::Runners
+module DockerRpmWorker::Runners
   class Rpm
 
     BUFFER_DUMP_INTERVAL = 60
@@ -56,7 +56,7 @@ module AbfWorker::Runners
           Process.wait(io.pid)
           @exit_status = $?.exitstatus
         end
-        @worker.status = @exit_status == 0 ? AbfWorker::BaseWorker::BUILD_COMPLETED : AbfWorker::BaseWorker::BUILD_FAILED
+        @worker.status = @exit_status == 0 ? DockerRpmWorker::BaseWorker::BUILD_COMPLETED : DockerRpmWorker::BaseWorker::BUILD_FAILED
         save_results
       end
       Thread.current[:subthreads] << @script_runner
@@ -73,7 +73,7 @@ module AbfWorker::Runners
       end
 
       if @rerun_tests != 'true' && @packages.size < 2
-        @worker.status = AbfWorker::BaseWorker::BUILD_FAILED
+        @worker.status = DockerRpmWorker::BaseWorker::BUILD_FAILED
       end
     end
 

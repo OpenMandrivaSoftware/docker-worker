@@ -1,7 +1,7 @@
-require 'abf-worker/models/base'
+require 'docker-rpm-worker/models/base'
 
-module AbfWorker::Models
-  class Job < AbfWorker::Models::Base
+module DockerRpmWorker::Models
+  class Job < DockerRpmWorker::Models::Base
 
     # A transformer. All data from an API will be transformed to 
     # BaseStat instance.
@@ -28,7 +28,7 @@ module AbfWorker::Models
               transform: BaseStat).job
     rescue => e
       # We don't raise exception, because high classes don't rescue it.
-      # AbfWorker::BaseWorker.send_error(e)
+      # DockerRpmWorker::BaseWorker.send_error(e)
       return nil
     end
 
@@ -36,7 +36,7 @@ module AbfWorker::Models
       new.get('/status', extra_query: options, transform: Status).status
     rescue => e
       # We don't raise exception, because high classes don't rescue it.
-      # AbfWorker::BaseWorker.send_error(e)
+      # DockerRpmWorker::BaseWorker.send_error(e)
       return nil
     end
 
@@ -44,7 +44,7 @@ module AbfWorker::Models
       new.put '/logs', extra_body: options
     rescue => e
       # We don't raise exception, because high classes don't rescue it.
-      # AbfWorker::BaseWorker.send_error(e)
+      # DockerRpmWorker::BaseWorker.send_error(e)
       return nil
     end
 
@@ -61,8 +61,6 @@ module AbfWorker::Models
     rescue => e
       sleep 2
       retry unless (tries -= 1).zero?
-      # We don't raise exception, because high classes don't rescue it.
-      AbfWorker::BaseWorker.send_error(e)
       return nil
     end
 

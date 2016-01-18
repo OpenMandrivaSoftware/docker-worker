@@ -1,6 +1,6 @@
 require 'time'
 
-module AbfWorker::Inspectors
+module DockerRpmWorker::Inspectors
   class LiveInspector
     CHECK_INTERVAL = 10 # 60 sec
 
@@ -36,7 +36,7 @@ module AbfWorker::Inspectors
     end
 
     def stop_build
-      @worker.status = AbfWorker::BaseWorker::BUILD_CANCELED
+      @worker.status = DockerRpmWorker::BaseWorker::BUILD_CANCELED
       runner = @worker.runner
       runner.can_run = false
       runner.script_runner.kill if runner.script_runner
@@ -47,12 +47,12 @@ module AbfWorker::Inspectors
 
     def status
       return 'USR1' if @worker.shutdown
-      q = 'abfworker::'
+      q = 'AbfWorker::'
       q << 'rpm'
       q << '-worker-'
       q << @worker.build_id.to_s
       q << '::live-inspector'
-      AbfWorker::Models::Job.status(key: q)
+      DockerRpmWorker::Models::Job.status(key: q)
     end
 
   end

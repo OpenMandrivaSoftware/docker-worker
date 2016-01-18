@@ -1,6 +1,6 @@
-require 'abf-worker/live_logger'
+require 'docker-rpm-worker/live_logger'
 
-module AbfWorker
+module DockerRpmWorker
   class BaseWorker
 
     BUILD_COMPLETED = 0
@@ -45,7 +45,7 @@ module AbfWorker
     end
 
     def init_live_logger(key_name)
-      @logger = AbfWorker::LiveLogger.new(key_name)
+      @logger = DockerRpmWorker::LiveLogger.new(key_name)
     end
 
     def file_store_token
@@ -105,7 +105,7 @@ module AbfWorker
     end
 
     def initialize_live_inspector(time_living)
-      @live_inspector = AbfWorker::Inspectors::LiveInspector.new(self, time_living)
+      @live_inspector = DockerRpmWorker::Inspectors::LiveInspector.new(self, time_living)
       @live_inspector.run
     end
 
@@ -117,7 +117,7 @@ module AbfWorker
           extra:  @extra
         }.merge(args)]
 
-        AbfWorker::Models::Job.feedback(
+        DockerRpmWorker::Models::Job.feedback(
           worker_queue: @observer_queue,
           worker_class: @observer_class,
           worker_args:  worker_args
