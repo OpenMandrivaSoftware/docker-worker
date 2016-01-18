@@ -40,7 +40,7 @@ module AbfWorker::Runners
         @cmd_params.merge!(params)
         @cmd_params.each { |key, value| @cmd_params[key] = value.to_s }
 
-        process = IO.popen(@cmd_params, '/bin/bash /' + @platform['type'] + '/build-rpm.sh', 'r', :pgroup=>true) do |io|
+        process = IO.popen(@cmd_params, '/bin/bash /' + @platform['type'] + '/build-rpm.sh', 'r', :err=>[:child, :out]) do |io|
           Thread.current[:script_pid] = io.pid
           reader = Thread.new do
             loop do

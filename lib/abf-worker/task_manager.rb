@@ -38,9 +38,10 @@ module AbfWorker
     end
 
     def cleanup_worker_thread
-      return if @worker_thread.nil? or @worker_thread.alive?
-      @worker_thread[:subthreads].each { |t| t.kill; puts t.status }
+      return if @worker_thread.nil? or (@worker_thread.alive? and not @shutdown)
+      @worker_thread[:subthreads].each { |t| t.kill }
       @worker_thread.kill
+      @worker_thread = nil
     end
 
     def stop_and_clean

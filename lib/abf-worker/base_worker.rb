@@ -1,4 +1,4 @@
-require 'abf-worker/logger'
+require 'abf-worker/live_logger'
 
 module AbfWorker
   class BaseWorker

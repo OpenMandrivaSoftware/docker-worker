@@ -7,7 +7,7 @@ module AbfWorker
     attr_accessor :runner
 
     def logger
-      @logger || init_live_logger("abfworker::rpm-worker-#{@build_id}")
+      @logger 
     end
 
     protected
@@ -19,6 +19,7 @@ module AbfWorker
       @observer_class = 'AbfWorker::RpmWorkerObserver'
       super options
       @runner = AbfWorker::Runners::Rpm.new(self, options)
+      init_live_logger("abfworker::rpm-worker-#{@build_id}")
       initialize_live_inspector options['time_living']
     end
 

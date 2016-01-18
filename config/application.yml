@@ -6,7 +6,7 @@ common: &common
     token: <%= ENV["BUILD_TOKEN"] %>
   supported_platforms: <%= ENV["BUILD_PLATFORM"].to_s  %>
   supported_arches: <%= ENV["BUILD_ARCH"].to_s %>
-  output_folder: '/home/omv/output'
+  output_folder: <%= ENV['HOME']+'/output' %>
 
 production:
   <<: *common
