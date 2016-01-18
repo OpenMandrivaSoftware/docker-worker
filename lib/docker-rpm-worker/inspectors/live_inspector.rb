@@ -47,7 +47,7 @@ module DockerRpmWorker::Inspectors
 
     def status
       return 'USR1' if @worker.shutdown
-      q = 'AbfWorker::'
+      q = 'abfworker::'
       q << 'rpm'
       q << '-worker-'
       q << @worker.build_id.to_s
