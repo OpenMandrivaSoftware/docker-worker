@@ -49,12 +49,11 @@ module DockerRpmWorker
     end
 
     def find_new_job
-      return if @worker_thread and @worker_thread.alive?
+      return if not @worker_thread.nil?
       return unless job = DockerRpmWorker::Models::Job.shift
 
       @worker_thread = Thread.new do
         worker = DockerRpmWorker::RpmWorker.new(job.worker_args[0])
-        Thread.current[:worker] = worker
 
         worker.perform
       end
