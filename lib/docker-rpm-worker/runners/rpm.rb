@@ -42,15 +42,13 @@ module DockerRpmWorker::Runners
 
         process = IO.popen(@cmd_params, '/bin/bash /' + @platform['type'] + '/build-rpm.sh', 'r', :err=>[:child, :out]) do |io|
           Thread.current[:script_pid] = io.pid
-          reader = Thread.new do
-            loop do
-              begin
-                break if io.eof
-                line = io.gets
-                @worker.logger.log(line)
-              rescue => e
-                break
-              end
+          while true
+            begin
+              break if io.eof
+              line = io.gets
+              @worker.logger.log(line)
+            rescue => e
+              break
             end
           end
           Process.wait(io.pid)
