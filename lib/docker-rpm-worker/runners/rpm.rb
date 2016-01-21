@@ -3,8 +3,6 @@ require 'json'
 module DockerRpmWorker::Runners
   class Rpm
 
-    BUFFER_DUMP_INTERVAL = 60
-
     attr_accessor :script_runner,
                   :can_run,
                   :packages,
@@ -46,6 +44,7 @@ module DockerRpmWorker::Runners
             begin
               break if io.eof
               line = io.gets
+              puts line
               @worker.logger.log(line)
             rescue => e
               break

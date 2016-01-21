@@ -2,7 +2,7 @@ require 'time'
 
 module DockerRpmWorker::Inspectors
   class LiveInspector
-    CHECK_INTERVAL = 10 # 60 sec
+    CHECK_INTERVAL = 60 # 60 sec
 
     def initialize(worker, time_living)
       @worker       = worker
