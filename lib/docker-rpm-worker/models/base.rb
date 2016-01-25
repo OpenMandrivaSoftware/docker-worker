@@ -7,7 +7,7 @@ module DockerRpmWorker::Models
     base_uri APP_CONFIG['abf_api']['url']
     basic_auth APP_CONFIG['abf_api']['token'], ''
     # Timeout for opening connection and reading data.
-    default_timeout 7
+    default_timeout 120
 
     format :json
 

@@ -10,8 +10,8 @@ module DockerRpmWorker
         loop do
           sleep LOG_DUMP_INTERVAL
           next if @buffer.empty?
-          str = @buffer.join
           @log_mutex.synchronize do
+            str = @buffer.join
             DockerRpmWorker::Models::Job.logs({name: @key_name, logs: str})
           end
         end

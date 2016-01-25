@@ -7,7 +7,7 @@ module DockerRpmWorker
     attr_accessor :runner
 
     def logger
-      @logger 
+      @logger
     end
 
     protected
