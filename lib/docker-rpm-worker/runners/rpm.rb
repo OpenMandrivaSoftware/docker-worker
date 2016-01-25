@@ -3,10 +3,9 @@ require 'json'
 module DockerRpmWorker::Runners
   class Rpm
 
-    attr_accessor :script_runner,
-                  :can_run,
-                  :packages,
-                  :exit_status
+    attr_accessor :packages,
+                  :exit_status,
+                  :script_pid
 
     def initialize(worker, options)
       @worker               = worker
@@ -16,30 +15,30 @@ module DockerRpmWorker::Runners
       @include_repos        = options['include_repos']
       @user                 = options['user']
       @rerun_tests          = options['rerun_tests'].to_s
-      @can_run              = true
       @packages             = []
+      @script_pid           = nil
     end
 
     def run_script
-      @script_runner = Thread.new do
-        include_repos_names = []
-        include_repos_urls = []
-        @include_repos.each do |key, value|
-          include_repos_names << key
-          include_repos_urls << value
-        end
-        params = {
-          'REPO_NAMES'    => include_repos_names.join(' '),
-          'REPO_URL'      => include_repos_urls.join(' '),
-          'UNAME'         => @user['uname'],
-          'EMAIL'         => @user['email'],
-          'PLATFORM_ARCH' => @platform['arch']
-        }
-        @cmd_params.merge!(params)
-        @cmd_params.each { |key, value| @cmd_params[key] = value.to_s }
+      include_repos_names = []
+      include_repos_urls = []
+      @include_repos.each do |key, value|
+        include_repos_names << key
+        include_repos_urls << value
+      end
+      params = {
+        'REPO_NAMES'    => include_repos_names.join(' '),
+        'REPO_URL'      => include_repos_urls.join(' '),
+        'UNAME'         => @user['uname'],
+        'EMAIL'         => @user['email'],
+        'PLATFORM_ARCH' => @platform['arch']
+      }
+      @cmd_params.merge!(params)
+      @cmd_params.each { |key, value| @cmd_params[key] = value.to_s }
 
+      if @worker.status != DockerRpmWorker::BaseWorker::BUILD_CANCELED
         process = IO.popen(@cmd_params, '/bin/bash /' + @platform['type'] + '/build-rpm.sh', 'r', :err=>[:child, :out]) do |io|
-          Thread.current[:script_pid] = io.pid
+          @script_pid = io.pid
           while true
             begin
               break if io.eof
@@ -53,11 +52,11 @@ module DockerRpmWorker::Runners
           Process.wait(io.pid)
           @exit_status = $?.exitstatus
         end
-        @worker.status = @exit_status == 0 ? DockerRpmWorker::BaseWorker::BUILD_COMPLETED : DockerRpmWorker::BaseWorker::BUILD_FAILED
+        if @worker.status != DockerRpmWorker::BaseWorker::BUILD_CANCELED
+          @worker.status = @exit_status == 0 ? DockerRpmWorker::BaseWorker::BUILD_COMPLETED : DockerRpmWorker::BaseWorker::BUILD_FAILED
+        end
         save_results
       end
-      Thread.current[:subthreads] << @script_runner
-      @script_runner.join if @can_run
     end
 
     private
