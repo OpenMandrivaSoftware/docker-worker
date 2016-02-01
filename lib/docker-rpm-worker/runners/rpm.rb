@@ -68,8 +68,10 @@ module DockerRpmWorker::Runners
         File.delete container_data
       end
 
-      if @rerun_tests != 'true' && @packages.size < 2
-        @worker.status = DockerRpmWorker::BaseWorker::BUILD_FAILED
+      if @worker.status != DockerRpmWorker::BaseWorker::BUILD_CANCELED
+        if @rerun_tests != 'true' && @packages.size < 2
+          @worker.status = DockerRpmWorker::BaseWorker::BUILD_FAILED
+        end
       end
     end
 

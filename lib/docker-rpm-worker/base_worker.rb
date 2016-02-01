@@ -14,7 +14,6 @@ module DockerRpmWorker
     attr_accessor :status,
                   :build_id,
                   :worker_id,
-                  :tmp_dir,
                   :live_inspector,
                   :shutdown,
                   :url_to_build
