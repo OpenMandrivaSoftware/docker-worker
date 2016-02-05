@@ -1,4 +1,5 @@
 require 'docker-rpm-worker/live_logger'
+require 'cgi'
 
 module DockerRpmWorker
   class BaseWorker
@@ -81,7 +82,7 @@ module DockerRpmWorker
         command << file_store_token
         command << ': -POST -F "file_store[file]=@'
         command << path_to_file
-        command << '" '
+        command << ';filename=' + CGI.encode(file_name) + '" '
         command << APP_CONFIG['file_store']['create_url']
         command << ' --connect-timeout 5 --retry 5'
         %x[ #{command} ]
