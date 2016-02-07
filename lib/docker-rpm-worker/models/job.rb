@@ -27,6 +27,8 @@ module DockerRpmWorker::Models
               },
               transform: BaseStat).job
     rescue => e
+      puts e.message
+      puts e.backtrace
       # We don't raise exception, because high classes don't rescue it.
       # DockerRpmWorker::BaseWorker.send_error(e)
       return nil
@@ -35,6 +37,8 @@ module DockerRpmWorker::Models
     def self.status(options = {})
       new.get('/status', extra_query: options, transform: Status).status
     rescue => e
+      puts e.message
+      puts e.backtrace
       # We don't raise exception, because high classes don't rescue it.
       # DockerRpmWorker::BaseWorker.send_error(e)
       return nil
@@ -43,6 +47,8 @@ module DockerRpmWorker::Models
     def self.logs(options = {})
       new.put '/logs', extra_body: options
     rescue => e
+      puts e.message
+      puts e.backtrace
       # We don't raise exception, because high classes don't rescue it.
       # DockerRpmWorker::BaseWorker.send_error(e)
       return nil
@@ -51,6 +57,8 @@ module DockerRpmWorker::Models
     def self.statistics(options = {})
       new.put '/statistics', extra_body: options
     rescue => e
+      puts e.message
+      puts e.backtrace
       # We don't raise exception, because high classes don't rescue it.
       return nil
     end
@@ -59,6 +67,8 @@ module DockerRpmWorker::Models
       tries ||= 5
       new.put '/feedback', extra_body: options
     rescue => e
+      puts e.message
+      puts e.backtrace
       sleep 2
       retry unless (tries -= 1).zero?
       return nil
