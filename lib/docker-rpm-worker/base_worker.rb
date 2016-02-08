@@ -28,7 +28,7 @@ module DockerRpmWorker
       @status     = BUILD_STARTED
       @build_id   = options['id']
       @worker_id  = Process.ppid
-      update_build_status_on_abf
+      update_build_status_on_abf({hostname: `hostname`.strip})
     end
 
     def perform
