@@ -30,7 +30,7 @@ module DockerRpmWorker
       update_build_status_on_abf({
         results:      results,
         packages:     @runner.packages,
-        exit_status:  @runner.exit_status
+        exit_status:  @runner.exit_status,
         commit_hash:  `git --git-dir=#{ENV['home']/#{options['cmd_params']['PACKAGE']/.git} rev-parse HEAD`.strip
       })
     end
