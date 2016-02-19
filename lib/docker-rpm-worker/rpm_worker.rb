@@ -18,7 +18,7 @@ module DockerRpmWorker
       super options
       @runner = DockerRpmWorker::Runners::Rpm.new(self, options)
       init_live_logger("abfworker::rpm-worker-#{@build_id}")
-      init_file_logger(APP_CONFIG['output_folder'] + '/build.log')
+      init_file_logger(APP_CONFIG['output_folder'] + '/script_output.log')
       initialize_live_inspector options['time_living']
     end
 
