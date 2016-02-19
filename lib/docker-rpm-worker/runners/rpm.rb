@@ -44,7 +44,8 @@ module DockerRpmWorker::Runners
               break if io.eof
               line = io.gets
               puts line
-              @worker.logger.log(line)
+              @worker.live_logger.log(line)
+              @worker.file_logger.log(line)
             rescue => e
               break
             end
@@ -52,6 +53,7 @@ module DockerRpmWorker::Runners
           Process.wait(io.pid)
           @exit_status = $?.exitstatus
         end
+        @worker.file_logger.close
         if @worker.status != DockerRpmWorker::BaseWorker::BUILD_CANCELED
           @worker.status = @exit_status == 0 ? DockerRpmWorker::BaseWorker::BUILD_COMPLETED : DockerRpmWorker::BaseWorker::BUILD_FAILED
         end

@@ -1,4 +1,5 @@
 require 'docker-rpm-worker/live_logger'
+require 'docker-rpm-worker/file_logger'
 require 'cgi'
 
 module DockerRpmWorker
@@ -16,8 +17,7 @@ module DockerRpmWorker
                   :build_id,
                   :worker_id,
                   :live_inspector,
-                  :shutdown,
-                  :url_to_build
+                  :shutdown
 
     def initialize(options)
       Thread.current[:subthreads] ||= []
@@ -38,14 +38,12 @@ module DockerRpmWorker
 
     protected
 
-    def url_to_build
-      return @url_to_build if @url_to_build
-      path = 'build_lists'
-      @url_to_build = "#{APP_CONFIG['abf_url']}/#{path}/#{@build_id}"
+    def init_file_logger(file_path)
+      @file_logger = DockerRpmWorker::FileLogger.new(file_path)
     end
 
     def init_live_logger(key_name)
-      @logger = DockerRpmWorker::LiveLogger.new(key_name)
+      @live_logger = DockerRpmWorker::LiveLogger.new(key_name)
     end
 
     def file_store_token
@@ -55,15 +53,6 @@ module DockerRpmWorker
     def upload_file_to_file_store(path, file_name)
       path_to_file = path + '/' + file_name
       return unless File.file?(path_to_file)
-      if file_name =~ /.log$/
-        tmp_file = "#{path_to_file}.tmp"
-        File.open(tmp_file, 'w') do |f|
-          f.puts "==> See: '#{url_to_build}'"
-          f.puts ''
-          File.foreach(path_to_file){ |li| f.puts li }
-        end
-        File.rename tmp_file, path_to_file
-      end
 
       # Compress the log when file size more than 10MB
       file_size = (File.size(path_to_file).to_f / TWO_IN_THE_TWENTIETH).round(2)
