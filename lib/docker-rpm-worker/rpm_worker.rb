@@ -18,12 +18,13 @@ module DockerRpmWorker
       super options
       @runner = DockerRpmWorker::Runners::Rpm.new(self, options)
       init_live_logger("abfworker::rpm-worker-#{@build_id}")
-      init_file_logger(APP_CONFIG['output_folder'] + '/script_output.log')
+      init_file_logger(ENV['HOME'] + '/script_output.log')
       initialize_live_inspector options['time_living']
     end
 
     def send_results
       sha1_s  = @runner.packages.map{ |p| p['sha1'] }
+      system 'mv ' + ENV['HOME'] + '/script_output.log ' + APP_CONFIG['output_folder']
       results = upload_results_to_file_store
       results.select!{ |r| !sha1_s.include?(r[:sha1]) } unless sha1_s.empty?
       update_build_status_on_abf({
