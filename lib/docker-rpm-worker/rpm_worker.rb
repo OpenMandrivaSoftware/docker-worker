@@ -27,12 +27,14 @@ module DockerRpmWorker
       system 'mv ' + ENV['HOME'] + '/script_output.log ' + APP_CONFIG['output_folder']
       results = upload_results_to_file_store
       results.select!{ |r| !sha1_s.include?(r[:sha1]) } unless sha1_s.empty?
-      update_build_status_on_abf({
+      res = {
         results:      results,
         packages:     @runner.packages,
         exit_status:  @runner.exit_status,
         commit_hash:  (File.read(ENV['HOME'] + '/commit_hash') rescue '').strip
-      })
+      }
+      res[:fail_reason] = (File.read(ENV['HOME'] + '/build_fail_reason.log') rescue '').strip if @status == BUILD_FAILED
+      update_build_status_on_abf(res)
     end
 
   end
