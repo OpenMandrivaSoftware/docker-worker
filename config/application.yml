@@ -1,5 +1,5 @@
 common: &common
-  abf_url: 'https://abf.openmandriva.org/api/v1'
+  abf_url: 'https://abf.openmandriva.org/'
   file_store:
     url: 'http://file-store.openmandriva.org/api/v1/file_stores'
     create_url: 'http://file-store.openmandriva.org/api/v1/upload'

@@ -1,6 +1,7 @@
 require 'docker-rpm-worker/live_logger'
 require 'docker-rpm-worker/file_logger'
 require 'cgi'
+require 'net/http'
 
 module DockerRpmWorker
   class BaseWorker
@@ -28,7 +29,7 @@ module DockerRpmWorker
       @status     = BUILD_STARTED
       @build_id   = options['id']
       @worker_id  = Process.ppid
-      update_build_status_on_abf({hostname: `hostname`.strip})
+      update_build_status_on_abf({hostname: Socket.gethostname})
     end
 
     def perform
@@ -100,6 +101,18 @@ module DockerRpmWorker
 
     def update_build_status_on_abf(args = {}, force = false)
       if !@skip_feedback || force
+        if APP_CONFIG["abf_url"]
+          url = URI(APP_CONFIG["abf_url"]) rescue nil
+          if url
+            loop do
+              code = (Net::HTTP.start(url.host, url.port, use_ssl: url.scheme == 'https') do |http|
+                http.head("/").code
+              end rescue 0).to_i
+              break if code >= 200 and code < 400
+              sleep 10
+            end
+          end
+        end
         worker_args = [{
           id:     @build_id,
           status: @status,
