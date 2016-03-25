@@ -1,0 +1,12 @@
+common: &common
+  abf_url: 'http://172.17.0.1:3000/api/v1'
+  file_store:
+    url: 'http://file-store.openmandriva.org/api/v1/file_stores'
+    create_url: 'http://file-store.openmandriva.org/api/v1/upload'
+    token: <%= ENV["BUILD_TOKEN"] %>
+  supported_platforms: <%= ENV["BUILD_PLATFORM"].to_s  %>
+  supported_arches: <%= ENV["BUILD_ARCH"].to_s %>
+  output_folder: <%= ENV['HOME']+'/output' %>
+  abf_api:
+    url: 'http://172.17.0.1:3000/api/v1'
+    token: <%= ENV["BUILD_TOKEN"] %>

@@ -30,10 +30,12 @@ module DockerRpmWorker
     # only for RPM
     def send_statistics
       DockerRpmWorker::Models::Job.statistics({
-        uid:          @uid,
-        worker_count: 1,
-        busy_workers: (@worker_thread and @worker_thread.alive?) ? 1 : 0,
-        host:         Socket.gethostname
+        uid:                 @uid,
+        worker_count:        1,
+        busy_workers:        (@worker_thread and @worker_thread.alive?) ? 1 : 0,
+        host:                Socket.gethostname,
+        supported_arches:    APP_CONFIG['supported_arches'],
+        supported_platforms: APP_CONFIG['supported_platforms']
       })
     end
 
