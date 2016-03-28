@@ -22,8 +22,9 @@ module DockerRpmWorker::Models
     def self.shift
       new.get('/shift',
               extra_query: {
-                platforms: APP_CONFIG['supported_platforms'],
-                arches:    APP_CONFIG['supported_arches']
+                platforms:     APP_CONFIG['supported_platforms'],
+                arches:        APP_CONFIG['supported_arches'],
+		native_arches: APP_CONFIG['native_arches']
               },
               transform: BaseStat).job
     rescue => e
