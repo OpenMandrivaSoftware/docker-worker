@@ -74,7 +74,7 @@ module DockerRpmWorker
         command << path_to_file
         command << ';filename=' + CGI.escape(file_name) + '" '
         command << APP_CONFIG['file_store']['create_url']
-        command << ' --connect-timeout 5 --retry 5 >> ' + APP_CONFIG['output_folder'] + '/curl.log 2&>1'
+        command << ' --connect-timeout 5 --retry 5 >> ' + APP_CONFIG['output_folder'] + '/curl.log 2>&1'
         %x[ #{command} ]
       end
 
