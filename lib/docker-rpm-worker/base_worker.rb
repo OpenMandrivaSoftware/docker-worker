@@ -51,7 +51,7 @@ module DockerRpmWorker
       @file_store_token ||= APP_CONFIG['file_store']['token']
     end
 
-    def upload_file_to_file_store(path, file_name)
+    def upload_file_to_file_store(path, file_name, output_curl_log = true)
       path_to_file = path + '/' + file_name
       return unless File.file?(path_to_file)
 
@@ -74,7 +74,10 @@ module DockerRpmWorker
         command << path_to_file
         command << ';filename=' + CGI.escape(file_name) + '" '
         command << APP_CONFIG['file_store']['create_url']
-        command << ' --connect-timeout 5 --retry 5 >> ' + APP_CONFIG['output_folder'] + '/curl.log 2>&1'
+        command << ' --connect-timeout 5 --retry 5'
+        if output_curl_log
+          command << ' >> ' + APP_CONFIG['output_folder'] + '/curl.log 2>&1'
+        end
         %x[ #{command} ]
       end
 
@@ -91,6 +94,7 @@ module DockerRpmWorker
           uploaded << upload_file_to_file_store(results_folder, f)
         end
       end
+      uploaded << upload_file_to_file_store(results_folder, 'curl.log', false)
       uploaded.compact
     end
 
