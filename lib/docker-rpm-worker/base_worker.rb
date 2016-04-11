@@ -68,7 +68,7 @@ module DockerRpmWorker
 
       # curl --user myuser@gmail.com:mypass -POST -F "file_store[file]=@files/archive.zip" http://file-store.rosalinux.ru/api/v1/file_stores.json
       if %x[ curl #{APP_CONFIG['file_store']['url']}.json?hash=#{sha1} ] == '[]'
-        command = 'curl --user '
+        command = 'curl --verbose --user '
         command << file_store_token
         command << ': -POST -F "file_store[file]=@'
         command << path_to_file
