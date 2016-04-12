@@ -72,7 +72,7 @@ module DockerRpmWorker
       else
         command = "curl --connect-timeout 60 #{APP_CONFIG['file_store']['url']}.json?hash=#{sha1}"
       end
-      if %x[ curl --connect-timeout 60 #{APP_CONFIG['file_store']['url']}.json?hash=#{sha1} 2>> #{APP_CONFIG['output_folder']}/curl.log ] == '[]'
+      if %x[ #{command} ] == '[]'
         command = 'curl --verbose --user '
         command << file_store_token
         command << ': -POST -F "file_store[file]=@'
