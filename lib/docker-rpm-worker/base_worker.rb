@@ -67,14 +67,14 @@ module DockerRpmWorker
       sha1 = Digest::SHA1.file(path_to_file).hexdigest
 
       # curl --user myuser@gmail.com:mypass -POST -F "file_store[file]=@files/archive.zip" http://file-store.rosalinux.ru/api/v1/file_stores.json
-      if %x[ curl #{APP_CONFIG['file_store']['url']}.json?hash=#{sha1} ] == '[]'
+      if %x[ curl #{APP_CONFIG['file_store']['url']}.json?hash=#{sha1} --connect-timeout 60 >> #{APP_CONFIG['output_folder]}/curl.log 2>&1 ] == '[]'
         command = 'curl --verbose --user '
         command << file_store_token
         command << ': -POST -F "file_store[file]=@'
         command << path_to_file
         command << ';filename=' + CGI.escape(file_name) + '" '
         command << APP_CONFIG['file_store']['create_url']
-        command << ' --connect-timeout 5 --retry 5'
+        command << ' --connect-timeout 60 --retry 5'
         if output_curl_log
           command << ' >> ' + APP_CONFIG['output_folder'] + '/curl.log 2>&1'
         end
