@@ -77,9 +77,9 @@ module DockerRpmWorker
         command << file_store_token
         command << ': -POST -F "file_store[file]=@'
         command << path_to_file
-        command << ';filename=' + CGI.escape(file_name) + '" '
+        command << ';filename=' + CGI.escape(file_name) + '"'
+        command << ' --connect-timeout 60 --retry 5 '
         command << APP_CONFIG['file_store']['create_url']
-        command << ' --connect-timeout 60 --retry 5'
         if output_curl_log
           command << ' >> ' + APP_CONFIG['output_folder'] + '/curl.log 2>&1'
         end
